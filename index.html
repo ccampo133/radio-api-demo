@@ -1,0 +1,115 @@
+<html>
+<head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+</style>
+</head>
+<body>
+    <script>
+    var plot, cf, span, resBw, vidBw, refLvl, scale, delay;
+    var socket = io.connect();
+    var started = false;
+
+    socket.on('connected', onConnected);
+    socket.on('psd', onPsd);
+    
+    $(document).ready(function () {
+        var options = {
+            series:  {shadowSize: 0},
+            colors: ['green']
+        };
+
+        plot = $.plot($("#placeholder"), [], options);
+
+        // Set initial values
+        applyValues();
+
+        $("#apply").click(applyValues);
+        $("#stopStart").click(onStopStartClick);
+    });
+
+    function onStopStartClick() {
+        started = !started;
+
+        if(started)
+        {
+            $("#stopStart").text('Stop');
+            requestPsd();
+        }
+        else
+        {
+            $("#stopStart").text('Start');
+        }
+    }
+
+    function applyValues() {
+        cf = $("#cfTxt").val();
+        span = $("#spanTxt").val();
+        resBw = $("#resBwTxt").val();
+        vidBw = $("#vidBwTxt").val();
+        refLvl = $("#refLvlTxt").val();
+        scale = $("#scaleTxt").val();
+        delay = $("#delayTxt").val();
+    }
+
+    function requestPsd() {
+        console.log("Requesting new psd...");
+        socket.emit(
+            'getPsd',
+            {
+                cf: cf, 
+                span: span, 
+                resBw: resBw, 
+                vidBw: vidBw,
+                refLvl: refLvl,
+                scale: scale
+            }
+        );
+    }
+
+    function onConnected(data) {
+        console.log("Connected successfully");
+        requestPsd();
+        started = true;
+    }
+
+    function onPsd(data) {
+        console.log("Recieved psd: ")
+        console.log(data);
+
+        // Get plottable data
+        var series = []
+        for (var i = 0; i < data.freq.length; i++) {
+            series.push([data.freq[i], data.psd[i]]);
+        };
+
+        // Plot data
+        var options = plot.getOptions();
+        options.yaxes[0].max = refLvl;
+        options.yaxes[0].min = refLvl - 10 * scale;
+
+        plot.setData([series]);
+        plot.setupGrid();
+        plot.draw();
+
+        if (!started)
+            return;
+
+        setTimeout(requestPsd, delay);
+    }
+    </script>
+    <div id="placeholder" style="width:500px;height:300px"></div>
+    <ul>
+        <li>Center Frequency (MHz): <input type="textbox" value=20 id="cfTxt"> 
+        <li>Span (MHz): <input type="textbox" value=10 id="spanTxt"> 
+        <li>Res. BW (kHz): <input type="textbox" value=0.01 id="resBwTxt"> 
+        <li>Vid. BW (kHz): <input type="textbox" value=0.01 id="vidBwTxt"> 
+        <li>Ref. Level (dBm/Hz): <input type="textbox" value=2.0 id="refLvlTxt"> 
+        <li>Scale (dB/div): <input type="textbox" value=0.4 id="scaleTxt">
+        <li>Delay (ms): <input type="textbox" value=60 id="delayTxt">
+    </ul>
+    <button id="apply">Apply</button>
+    <button id="stopStart">Stop</button>
+</body>
+</html>
