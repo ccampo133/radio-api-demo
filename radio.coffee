@@ -2,7 +2,7 @@ getPsd = (centerFreq, span, resBw, vidBw, refLvl, scale) ->
 	start = centerFreq - span / 2.0
 	n = (span / resBw)
 	x = (start + i*resBw for i in [0..n])
-	wave = Math.cos
+	wave = sinc
 	y = (wave(xi) + randNormal(0, 0.05) for xi in x)
 	psd = 
 		refLvl: refLvl

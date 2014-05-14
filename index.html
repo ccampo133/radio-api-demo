@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script src="/lib/chroma.js"></script>
+    <script src="chroma.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
@@ -98,7 +98,7 @@
         plot.setupGrid();
         plot.draw();
 
-        drawWaterfall();
+        drawWaterfall(data.psd);
 
         if (!started)
             return;
@@ -107,25 +107,34 @@
     }
 
 
-    function drawWaterfall() {
+    function drawWaterfall(data) {
         var canvas = document.getElementById("waterfall");
         var ctx = $("#waterfall").get()[0].getContext("2d");
         tempCtx.drawImage(canvas, 0, 0, 500, 300);
 
-        // used for color distribution
-        var hot = new chroma.ColorScale({
-            colors: [ '#000000', '#0B16B5', '#FFF782', '#EB1250' ],
-            positions: [ -1, -0.5, 0.5, 1 ],
-            mode:'rgb',
-            limits:[0, 300]
-        });
+        var scale = chroma.scale([ '#000000', '#0B16B5', '#FFF782', '#EB1250' ]).domain([-1,1]);
+
+        // Bin down the data to fit on the plot
+        // TODO: handle scaling up
+        var pixelValues = [];
+        var binSize = Math.floor(data.length / 500);
+        for(var i = 0; i < 500; i++) {
+            var sum = 0;
+            for(var j = 0; j < binSize; j++) {
+                if((i*binSize) + j < data.length) {
+                    var val = data[(i*binSize) + j];
+                    sum += val;
+                }
+            }
+            pixelValues.push(sum/binSize);
+        }
 
         for (var i = 0; i < 500; i++) {
-            ctx.fillStyle = hot.getColor(Math.random()).hex();
-            ctx.fillRect(i, 1, 1, 1);
-            ctx.drawImage(canvas, 0, 0, 500, 300, 0, 1, 500, 300);
+            var val = pixelValues[i];
+            ctx.fillStyle = scale(val).hex();
+            ctx.fillRect(i, 299, 1, 1);
         }
-        ctx.drawImage(tempCanvas, 0, 0, 500, 300, 0, 1, 500, 300);
+        ctx.drawImage(tempCanvas, 0, 0, 500, 300, 0, -1, 500, 300);
     }
     </script>
     <canvas id="waterfall" width="500" height="300" style="display: block; background-color: black; z-index: -1;"></canvas>
@@ -137,7 +146,7 @@
         <li>Vid. BW (kHz): <input type="textbox" value=0.01 id="vidBwTxt"> 
         <li>Ref. Level (dBm/Hz): <input type="textbox" value=2.0 id="refLvlTxt"> 
         <li>Scale (dB/div): <input type="textbox" value=0.4 id="scaleTxt">
-        <li>Delay (ms): <input type="textbox" value=60 id="delayTxt">
+        <li>Delay (ms): <input type="textbox" value=200 id="delayTxt">
     </ul>
     <button id="apply">Apply</button>
     <button id="stopStart">Stop</button>

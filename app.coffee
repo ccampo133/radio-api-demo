@@ -22,8 +22,8 @@ server.get('/', (req, res, next) ->
     )
 )
 
-server.get(/.*/, restify.serveStatic({
-    'directory': 'lib'
+server.get(/^\/?.*/, restify.serveStatic({
+    'directory': __dirname
  }));
 
 server.get('/radio', (req, res, next) ->
