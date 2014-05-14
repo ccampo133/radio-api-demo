@@ -22,6 +22,10 @@ server.get('/', (req, res, next) ->
     )
 )
 
+server.get(/.*/, restify.serveStatic({
+    'directory': 'lib'
+ }));
+
 server.get('/radio', (req, res, next) ->
 	cf = req.params.cf
 	span = req.params.span
@@ -41,5 +45,5 @@ io.sockets.on('connection', (socket) ->
 	)
 )
 
-server.listen(3000, -> 
+server.listen(8080, -> 
 	console.log "#{ server.name } listening at #{ server.url }")

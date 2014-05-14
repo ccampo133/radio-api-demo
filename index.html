@@ -1,5 +1,6 @@
 <html>
 <head>
+    <script src="/lib/chroma.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
@@ -10,6 +11,10 @@
     var plot, cf, span, resBw, vidBw, refLvl, scale, delay;
     var socket = io.connect();
     var started = false;
+    var tempCanvas = document.createElement("canvas");
+    var tempCtx = tempCanvas.getContext("2d");
+    tempCanvas.width=500;
+    tempCanvas.height=300;
 
     socket.on('connected', onConnected);
     socket.on('psd', onPsd);
@@ -93,12 +98,37 @@
         plot.setupGrid();
         plot.draw();
 
+        drawWaterfall();
+
         if (!started)
             return;
 
         setTimeout(requestPsd, delay);
     }
+
+
+    function drawWaterfall() {
+        var canvas = document.getElementById("waterfall");
+        var ctx = $("#waterfall").get()[0].getContext("2d");
+        tempCtx.drawImage(canvas, 0, 0, 500, 300);
+
+        // used for color distribution
+        var hot = new chroma.ColorScale({
+            colors: [ '#000000', '#0B16B5', '#FFF782', '#EB1250' ],
+            positions: [ -1, -0.5, 0.5, 1 ],
+            mode:'rgb',
+            limits:[0, 300]
+        });
+
+        for (var i = 0; i < 500; i++) {
+            ctx.fillStyle = hot.getColor(Math.random()).hex();
+            ctx.fillRect(i, 1, 1, 1);
+            ctx.drawImage(canvas, 0, 0, 500, 300, 0, 1, 500, 300);
+        }
+        ctx.drawImage(tempCanvas, 0, 0, 500, 300, 0, 1, 500, 300);
+    }
     </script>
+    <canvas id="waterfall" width="500" height="300" style="display: block; background-color: black; z-index: -1;"></canvas>
     <div id="placeholder" style="width:500px;height:300px"></div>
     <ul>
         <li>Center Frequency (MHz): <input type="textbox" value=20 id="cfTxt"> 
