@@ -106,28 +106,72 @@
         setTimeout(requestPsd, delay);
     }
 
+    function scaleDown(y, newLength) {
+        var newY = [];
+        var dx = y.length / newLength;
+        for(var i = 0; i < newLength; i++) {
+            var x = i*dx;
+            var x0 = Math.floor(x);
+            var x1 = Math.ceil(x);
+            var y0 = y[x0];
+            var y1 = y[x1];
+            var yi = y0 + (y1 - y0)*(x -x0);
+            newY.push(yi);
+        }
+        return newY;
+    }
+ 
+        /*
+        for(var i = 0; i < newLength; i++) {
+            var sum = 0;
+            var nPts = 0;
+            for(var j = 0; j < binSize; j++) {
+                if((i * binSize) + j < data.length) {
+                    var val = y[(i * binSize) + j];
+                    sum += val;
+                    nPts++;
+                }
+            }
+
+            newY.push(sum/nPts);
+        }*/
+
+    /*
+    function scaleUp(x, y, newLength) {
+        var newY = [];
+        var newX = [];
+
+        var step = (x[x.length - 1] - x[0]) / newLength;
+
+        newX.push(x[0]);
+
+        for(var i = 1; i < x.length; i++)
+        {
+            var x0 = x[i - 1];
+            var x1 = x[i];
+            var y0 = y[i - 1];
+            var y1 = y[i];
+            for(var j = 0; j < newLength; j++) {
+
+            }
+        }
+
+        for(var i = 1; i < data.newLength; i++) {
+            newX.push(newX[i - 1] + step);
+        }
+    }*/
 
     function drawWaterfall(data) {
         var canvas = document.getElementById("waterfall");
         var ctx = $("#waterfall").get()[0].getContext("2d");
         tempCtx.drawImage(canvas, 0, 0, 500, 300);
 
-        var scale = chroma.scale([ '#000000', '#0B16B5', '#FFF782', '#EB1250' ]).domain([-1,1]);
+        var scale = chroma.scale(['#000000','#0B16B5','#FFF782','#EB1250'])
+                          .domain([-1,1]);
 
         // Bin down the data to fit on the plot
         // TODO: handle scaling up
-        var pixelValues = [];
-        var binSize = Math.floor(data.length / 500);
-        for(var i = 0; i < 500; i++) {
-            var sum = 0;
-            for(var j = 0; j < binSize; j++) {
-                if((i*binSize) + j < data.length) {
-                    var val = data[(i*binSize) + j];
-                    sum += val;
-                }
-            }
-            pixelValues.push(sum/binSize);
-        }
+        var pixelValues = scaleDown(data, 500);
 
         for (var i = 0; i < 500; i++) {
             var val = pixelValues[i];
