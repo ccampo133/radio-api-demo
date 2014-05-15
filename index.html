@@ -106,17 +106,31 @@
         setTimeout(requestPsd, delay);
     }
 
+    // TODO: push this to bg thread?
     function scaleDown(y, newLength) {
         var newY = [];
         var dx = y.length / newLength;
         for(var i = 0; i < newLength; i++) {
             var x = i*dx;
-            var x0 = Math.floor(x);
+
             var x1 = Math.ceil(x);
+            if(x1 == y.length)
+                x1 = Math.floor(x);
+            var x0 = x1 - 1;
+
             var y0 = y[x0];
             var y1 = y[x1];
             var yi = y0 + (y1 - y0)*(x -x0);
             newY.push(yi);
+
+            if(i == newLength - 1) {
+                console.log(yi);
+                console.log(x);
+                console.log(x0);
+                console.log(x1);
+                console.log(y0);
+                console.log(y1);
+            }
         }
         return newY;
     }
@@ -196,3 +210,4 @@
     <button id="stopStart">Stop</button>
 </body>
 </html>
+        }
