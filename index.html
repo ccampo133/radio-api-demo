@@ -134,46 +134,6 @@
         }
         return newY;
     }
- 
-        /*
-        for(var i = 0; i < newLength; i++) {
-            var sum = 0;
-            var nPts = 0;
-            for(var j = 0; j < binSize; j++) {
-                if((i * binSize) + j < data.length) {
-                    var val = y[(i * binSize) + j];
-                    sum += val;
-                    nPts++;
-                }
-            }
-
-            newY.push(sum/nPts);
-        }*/
-
-    /*
-    function scaleUp(x, y, newLength) {
-        var newY = [];
-        var newX = [];
-
-        var step = (x[x.length - 1] - x[0]) / newLength;
-
-        newX.push(x[0]);
-
-        for(var i = 1; i < x.length; i++)
-        {
-            var x0 = x[i - 1];
-            var x1 = x[i];
-            var y0 = y[i - 1];
-            var y1 = y[i];
-            for(var j = 0; j < newLength; j++) {
-
-            }
-        }
-
-        for(var i = 1; i < data.newLength; i++) {
-            newX.push(newX[i - 1] + step);
-        }
-    }*/
 
     function drawWaterfall(data) {
         var canvas = document.getElementById("waterfall");
@@ -181,7 +141,7 @@
         tempCtx.drawImage(canvas, 0, 0, 500, 300);
 
         var scale = chroma.scale(['#000000','#0B16B5','#FFF782','#EB1250'])
-                          .domain([-1,1]);
+                          .domain([0,1]);
 
         // Bin down the data to fit on the plot
         // TODO: handle scaling up
