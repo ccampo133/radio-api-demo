@@ -1,0 +1,112 @@
+<html>
+<head>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <script src="chroma.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <style type="text/css">
+    .btn:focus {
+        outline: none;
+    }
+    </style>
+</head>
+<body>
+    <script>
+
+    var timePlot, complexPlot, complexPlot, powerPlot;
+    var socket = io.connect();
+
+    socket.on('connected', onConnected);
+    socket.on('FFT', onFFT);
+    
+    $(document).ready(function () {
+        var options = {
+            series:  {shadowSize: 0},
+            colors: ['green']
+        };
+
+        timePlot = $.plot($("#time-plot"), [], options);
+        realsPlot = $.plot($("#reals-plot"), [], options);
+        complexPlot = $.plot($("#complex-plot"), [], options);
+        powerPlot = $.plot($("#power-plot"), [], options);
+    });
+    
+    function getFFT() {
+        console.log("Getting FFT from server...");
+        socket.emit('getFFT', 
+            {
+                A: 1,
+                T: 1,
+                f: 0.25,
+                phi: 0,
+                n: 64
+            }
+        );
+    }
+
+    function onConnected(data) {
+        console.log("Connected successfully");
+        getFFT();
+    }
+
+    function onFFT(data) {
+        console.log("Recieved FFT: ")
+        console.log(data);
+
+        // Get plottable data
+        var timeSeries = []
+        for (var i = 0; i < data.time.length; i++) {
+            timeSeries.push([data.time[i], data.signal[i]]);
+        };
+
+        timePlot.setData([timeSeries]);
+        timePlot.setupGrid();
+        timePlot.draw();
+
+        var realsSeries = []
+        for (var i = 0; i < data.bins.length; i++) {
+            realsSeries.push([data.bins[i], data.reals[i]]);
+        };
+
+        realsPlot.setData([realsSeries]);
+        realsPlot.setupGrid();
+        realsPlot.draw();
+
+        var complexSeries = []
+        for (var i = 0; i < data.bins.length; i++) {
+            complexSeries.push([data.bins[i], data.complex[i]]);
+        };
+
+        complexPlot.setData([complexSeries]);
+        complexPlot.setupGrid();
+        complexPlot.draw();
+
+        var powerSeries = []
+        for (var i = 0; i < data.bins.length; i++) {
+            powerSeries.push([data.bins[i], data.power[i]]);
+        };
+
+        powerPlot.setData([powerSeries]);
+        powerPlot.setupGrid();
+        powerPlot.draw();
+
+        //setTimeout(requestPsd, delay);
+    }
+
+    </script>
+    Time Domain
+    <div id="time-plot" style="width:500px;height:200px"></div>
+
+    FFT - Reals
+    <div id="reals-plot" style="width:500px;height:200px"></div>
+
+    FFT - Complex
+    <div id="complex-plot" style="width:500px;height:200px"></div>
+
+    FFT - Power
+    <div id="power-plot" style="width:500px;height:200px"></div>
+</body>
+</html>

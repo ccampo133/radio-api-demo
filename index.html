@@ -1,10 +1,17 @@
 <html>
 <head>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
     <script src="chroma.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
-</style>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <style type="text/css">
+    .btn:focus {
+        outline: none;
+    }
+    </style>
 </head>
 <body>
     <script>
@@ -141,7 +148,7 @@
         tempCtx.drawImage(canvas, 0, 0, 500, 300);
 
         var scale = chroma.scale(['#000000','#0B16B5','#FFF782','#EB1250'])
-                          .domain([0,1]);
+                          .domain([-1,1]);
 
         // Bin down the data to fit on the plot
         // TODO: handle scaling up
@@ -155,19 +162,60 @@
         ctx.drawImage(tempCanvas, 0, 0, 500, 300, 0, -1, 500, 300);
     }
     </script>
-    <canvas id="waterfall" width="500" height="300" style="display: block; background-color: black; z-index: -1;"></canvas>
-    <div id="placeholder" style="width:500px;height:300px"></div>
-    <ul>
-        <li>Center Frequency (MHz): <input type="textbox" value=20 id="cfTxt"> 
-        <li>Span (MHz): <input type="textbox" value=10 id="spanTxt"> 
-        <li>Res. BW (kHz): <input type="textbox" value=0.01 id="resBwTxt"> 
-        <li>Vid. BW (kHz): <input type="textbox" value=0.01 id="vidBwTxt"> 
-        <li>Ref. Level (dBm/Hz): <input type="textbox" value=2.0 id="refLvlTxt"> 
-        <li>Scale (dB/div): <input type="textbox" value=0.4 id="scaleTxt">
-        <li>Delay (ms): <input type="textbox" value=200 id="delayTxt">
-    </ul>
-    <button id="apply">Apply</button>
-    <button id="stopStart">Stop</button>
+    <div class="row">
+        <div class="col-md-4">
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="cfTxt" class="col-sm-6 control-label">Center Frequency (MHz)</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="cfTxt" value=20>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="spanTxt" class="col-sm-6 control-label">Span (MHz)</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="spanTxt" value=10>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="resBwTxt" class="col-sm-6 control-label">RBW (kHz)</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="resBwTxt" value=0.01>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vidBwTxt" class="col-sm-6 control-label">VBW (kHz)</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="vidBwTxt" value=0.01>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="refLvlTxt" class="col-sm-6 control-label">Ref. Level (dBm/Hz)</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="refLvlTxt" value=2>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="scaleTxt" class="col-sm-6 control-label">Scale (dB/div)</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="scaleTxt" value=0.4>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="delayTxt" class="col-sm-6 control-label">Delay (ms)</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="delayTxt" value=200>
+                    </div>
+                </div>
+            </form>
+            <button role="button" type="button" class="btn btn-default" id="apply">Apply</button>
+            <button role="button" type="button" class="btn btn-default"id="stopStart">Stop</button>
+        </div>
+        <div class="col-md-6">
+            <canvas id="waterfall" width="500" height="300" style="display: block; background-color: black; z-index: -1;"></canvas>
+            <div id="placeholder" style="width:500px;height:300px"></div>
+        </div>
+    </div>
+
 </body>
 </html>
-        }

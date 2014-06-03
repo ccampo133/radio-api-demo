@@ -7,10 +7,11 @@ server.use(restify.fullResponse());
 server.use(restify.queryParser());
 
 io = require('socket.io').listen(server);
+io.set('log level', 1);
 
 // Router
 server.get('/', function(req, res, next) {
-    fs.readFile(__dirname + '/index.html', function(err, data) {
+    fs.readFile(__dirname + '/fft.html', function(err, data) {
         if (err) {
             next(err);
             return;
@@ -45,8 +46,14 @@ io.sockets.on('connection', function(socket) {
 	socket.on('getPsd', function(data) {
 		socket.emit('psd', radio.getPsd(data.cf, data.span, data.resBw, data.vidBw, data.refLvl, data.scale));
 	});
+    socket.on('tune', function(data) {
+        socket.emit('psd', radio.tune(data.cf, data.span, data.resBw, data.vidBw, data.refLvl, data.scale));
+    });
+    socket.on('getFFT', function(data) {
+        socket.emit('FFT', radio.getFFT(data.A, data.T, data.f, data.phi, data.n));
+    });
 });
 
-server.listen(8080, function() {
+server.listen(3000, function() {
 	console.log(server.name + " listening at " + server.url);
 });
