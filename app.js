@@ -46,9 +46,6 @@ io.sockets.on('connection', function(socket) {
 	socket.on('getPsd', function(data) {
 		socket.emit('psd', radio.getPsd(data.cf, data.span, data.resBw, data.vidBw, data.refLvl, data.scale));
 	});
-    socket.on('tune', function(data) {
-        socket.emit('psd', radio.tune(data.cf, data.span, data.resBw, data.vidBw, data.refLvl, data.scale));
-    });
     socket.on('getFFT', function(data) {
         socket.emit('FFT', radio.getFFT(data.A, data.T, data.f, data.phi, data.n));
     });

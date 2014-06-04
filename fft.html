@@ -1,17 +1,8 @@
 <html>
 <head>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-    <script src="chroma.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-    <style type="text/css">
-    .btn:focus {
-        outline: none;
-    }
-    </style>
 </head>
 <body>
     <script>
@@ -24,14 +15,18 @@
     
     $(document).ready(function () {
         var options = {
-            series:  {shadowSize: 0},
+            series:  {
+                shadowSize: 0,
+                lines : { lineWidth: 1 }
+            },
+
             colors: ['green']
         };
 
         timePlot = $.plot($("#time-plot"), [], options);
+        powerPlot = $.plot($("#power-plot"), [], options);
         realsPlot = $.plot($("#reals-plot"), [], options);
         complexPlot = $.plot($("#complex-plot"), [], options);
-        powerPlot = $.plot($("#power-plot"), [], options);
     });
     
     function getFFT() {
@@ -39,10 +34,10 @@
         socket.emit('getFFT', 
             {
                 A: 1,
-                T: 1,
-                f: 0.25,
+                T: 0.001,
+                f: 25,
                 phi: 0,
-                n: 64
+                n: 2048
             }
         );
     }
@@ -57,56 +52,58 @@
         console.log(data);
 
         // Get plottable data
-        var timeSeries = []
+        var timeSeries = new Array(data.time.length);
         for (var i = 0; i < data.time.length; i++) {
-            timeSeries.push([data.time[i], data.signal[i]]);
-        };
+            timeSeries[i] = [data.time[i], data.signal[i]];
+        }
 
         timePlot.setData([timeSeries]);
         timePlot.setupGrid();
         timePlot.draw();
 
-        var realsSeries = []
-        for (var i = 0; i < data.bins.length; i++) {
-            realsSeries.push([data.bins[i], data.reals[i]]);
-        };
-
-        realsPlot.setData([realsSeries]);
-        realsPlot.setupGrid();
-        realsPlot.draw();
-
-        var complexSeries = []
-        for (var i = 0; i < data.bins.length; i++) {
-            complexSeries.push([data.bins[i], data.complex[i]]);
-        };
-
-        complexPlot.setData([complexSeries]);
-        complexPlot.setupGrid();
-        complexPlot.draw();
-
-        var powerSeries = []
-        for (var i = 0; i < data.bins.length; i++) {
-            powerSeries.push([data.bins[i], data.power[i]]);
-        };
+        var powerSeries = new Array(data.freq.length);
+        for (var i = 0; i < data.freq.length; i++) {
+            powerSeries[i] = [data.freq[i], data.power[i]];
+        }
 
         powerPlot.setData([powerSeries]);
         powerPlot.setupGrid();
         powerPlot.draw();
 
-        //setTimeout(requestPsd, delay);
+        
+        var realsSeries = new Array(data.bins.length);
+        for (var i = 0; i < data.bins.length; i++) {
+            realsSeries[i] = [data.bins[i], data.reals[i]];
+        }
+
+        realsPlot.setData([realsSeries]);
+        realsPlot.setupGrid();
+        realsPlot.draw();
+
+        var complexSeries = new Array(data.bins.length);
+        for (var i = 0; i < data.bins.length; i++) {
+            complexSeries[i] = [data.bins[i], data.imag[i]];
+        }
+
+        complexPlot.setData([complexSeries]);
+        complexPlot.setupGrid();
+        complexPlot.draw();
     }
 
     </script>
-    Time Domain
-    <div id="time-plot" style="width:500px;height:200px"></div>
-
-    FFT - Reals
-    <div id="reals-plot" style="width:500px;height:200px"></div>
-
-    FFT - Complex
-    <div id="complex-plot" style="width:500px;height:200px"></div>
-
-    FFT - Power
-    <div id="power-plot" style="width:500px;height:200px"></div>
+    <table style:"width:500px">
+    <tr>
+        Time Domain: Amplitude vs. Time (sec)
+        <div id="time-plot" style="width:500px;height:300px"></div>
+    </tr>
+    <tr>
+        FFT: Power (dB) vs. Frequency (Hz)
+        <div id="power-plot" style="width:500px;height:300px"></div>
+    </tr>
+    <tr>
+        <td>FFT - Reals <div id="reals-plot" style="width:250px;height:200px"></div></td>
+        <td>FFT - Complex <div id="complex-plot" style="width:250px;height:200px"></div></td>
+    </tr>
+    </table>
 </body>
 </html>
