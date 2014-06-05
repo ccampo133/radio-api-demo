@@ -57,6 +57,13 @@ function boxcar(A, a, b, x) {
     }
 }
 
+function noise(mu, sigma, n) {
+    var vals = new Array(n);
+    for (var i = 0; i < n; i++)
+        vals[i] = randNormal(mu, sigma);
+    return vals;
+}
+
 function randNormal(mu, sigma) {
     var u1 = Math.random();
     var u2 = Math.random();
@@ -85,3 +92,4 @@ exports.square = square;
 exports.randNormal = randNormal;
 exports.boxcar = boxcar;
 exports.add = add;
+exports.noise = noise;

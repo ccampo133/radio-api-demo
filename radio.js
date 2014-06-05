@@ -35,8 +35,13 @@ function getFFT(A, T, f, phi, n, startFreq) {
 	}
 
 	// Generate the signal
-	var signal = sig_gen.sinusoid(A, f, t, phi);
-	signal = windowing.hann(signal);
+	//var signal = sig_gen.sinusoid(A, f, t, phi);
+	var carrier = sig_gen.sinusoid(A, f, t, phi);
+	var modfunc = sig_gen.cosine(A/4, f/10, t, phi);
+	modfunc = sig_gen.add([modfunc, sig_gen.cosine(A/4, f/15, t, phi)]);
+	var signal = modulator.am(carrier, modfunc);
+	signal = sig_gen.add([signal, sig_gen.noise(0, 0.01, n)]);
+	//signal = windowing.hann(signal);
 
 	var reals = signal.slice(0);
 	var imag = new Array(n);
@@ -48,12 +53,15 @@ function getFFT(A, T, f, phi, n, startFreq) {
 	fft.transform(reals, imag);
 
 	// Get the single-sided power spectrum in dB and the corresponding frequencies
-	var power = new Array(Math.floor(n/2));
-	var freq = new Array(Math.floor(n/2));
-	for (var i = 0; i < power.length; i++) {
-		var R = Math.pow(reals[i], 2);
-		var I = Math.pow(imag[i], 2);
-		power[i] = 2* 10 * Math.log((R + I) / Math.pow(n/2, 2)) / Math.log(10);
+	var n2 = (n % 2) == 0 ? 1 + (n / 2) : (n + 1) / 2; 
+
+	var power = new Array(n2);
+	var freq = new Array(n2);
+	for (var i = 0; i < n2; i++) {
+		var R = Math.pow(2 * reals[i], 2);
+		var I = Math.pow(2 * imag[i], 2);
+		var P = (R + I) / Math.pow(n2, 2);
+		power[i] = 10 * Math.log(P) / Math.log(10);
 		freq[i] = i * (1 / (n * T));
 	}
 
