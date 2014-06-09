@@ -26,7 +26,7 @@ function getPsd(centerFreq, span, resBw, vidBw, refLvl, scale, sigFreq) {
 }
 
 function getFFT(A, T, f, phi, n, startFreq) {
-	var t = new Array(n);
+    var t = new Array(n);
 	var bins = new Array(n);
 	for (var i = 0; i < n; i++) {
 		t[i] = i * T;
