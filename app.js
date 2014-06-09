@@ -11,7 +11,7 @@ io.set('log level', 1);
 
 // Router
 server.get('/', function(req, res, next) {
-    fs.readFile(__dirname + '/fft.html', function(err, data) {
+    fs.readFile(__dirname + '/index.html', function(err, data) {
         if (err) {
             next(err);
             return;
@@ -44,7 +44,7 @@ io.sockets.on('connection', function(socket) {
 	console.log("New connection: id = " + socket.id);
 	socket.emit('connected');
 	socket.on('getPsd', function(data) {
-		socket.emit('psd', radio.getPsd(data.cf, data.span, data.resBw, data.vidBw, data.refLvl, data.scale));
+		socket.emit('psd', radio.getPsd(data.cf, data.span, data.resBw, data.vidBw, data.refLvl, data.scale, data.sigFreq));
 	});
     socket.on('getFFT', function(data) {
         socket.emit('FFT', radio.getFFT(data.A, data.T, data.f, data.phi, data.n));

@@ -25,8 +25,8 @@
 
         timePlot = $.plot($("#time-plot"), [], options);
         powerPlot = $.plot($("#power-plot"), [], options);
-        realsPlot = $.plot($("#reals-plot"), [], options);
-        complexPlot = $.plot($("#complex-plot"), [], options);
+        //realsPlot = $.plot($("#reals-plot"), [], options);
+        //complexPlot = $.plot($("#complex-plot"), [], options);
     });
     
     function getFFT() {
@@ -34,11 +34,11 @@
         socket.emit('getFFT', 
             {
                 A: 1,
-                T: .0001220703125,
-                f: 2200,
+                T: .0005,
+                f: 1351.264876,
                 phi: 0,
                 n: 512
-            }
+             }
         );
     }
 
@@ -71,23 +71,23 @@
         powerPlot.draw();
 
         
-        var realsSeries = new Array(data.bins.length);
-        for (var i = 0; i < data.bins.length; i++) {
-            realsSeries[i] = [data.bins[i], data.reals[i]];
-        }
+        //var realsSeries = new Array(data.bins.length);
+        //for (var i = 0; i < data.bins.length; i++) {
+        //    realsSeries[i] = [data.bins[i], data.reals[i]];
+        //}
 
-        realsPlot.setData([realsSeries]);
-        realsPlot.setupGrid();
-        realsPlot.draw();
+        //realsPlot.setData([realsSeries]);
+        //realsPlot.setupGrid();
+        //realsPlot.draw();
 
-        var complexSeries = new Array(data.bins.length);
-        for (var i = 0; i < data.bins.length; i++) {
-            complexSeries[i] = [data.bins[i], data.imag[i]];
-        }
+        //var complexSeries = new Array(data.bins.length);
+        //for (var i = 0; i < data.bins.length; i++) {
+        //    complexSeries[i] = [data.bins[i], data.imag[i]];
+        //}
 
-        complexPlot.setData([complexSeries]);
-        complexPlot.setupGrid();
-        complexPlot.draw();
+        //complexPlot.setData([complexSeries]);
+        //complexPlot.setupGrid();
+        //complexPlot.draw();
     }
 
     </script>
@@ -100,10 +100,12 @@
         FFT: Power (dB) vs. Frequency (Hz)
         <div id="power-plot" style="width:500px;height:300px"></div>
     </tr>
+    <!--
     <tr>
         <td>FFT - Reals <div id="reals-plot" style="width:250px;height:200px"></div></td>
         <td>FFT - Complex <div id="complex-plot" style="width:250px;height:200px"></div></td>
     </tr>
+    -->
     </table>
 </body>
 </html>

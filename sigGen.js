@@ -86,6 +86,21 @@ function add(signals) {
     return signal;
 }
 
+function multiply(signals) {
+    var signal = [];
+    for (var i = 0; i < signals.length; i++) {
+        var curSig = signals[i];
+        if (i == 0) {
+            signal = curSig.slice(0);
+        }
+        else {
+            for (var j = 0; j < signal.length; j++)
+                signal[j] *= curSig[j];
+        }
+    }
+    return signal;
+}
+
 exports.sinusoid = sinusoid;
 exports.cosine = cosine;
 exports.square = square;
@@ -93,3 +108,4 @@ exports.randNormal = randNormal;
 exports.boxcar = boxcar;
 exports.add = add;
 exports.noise = noise;
+exports.multiply = multiply;

@@ -15,7 +15,7 @@
 </head>
 <body>
     <script>
-    var plot, cf, span, resBw, vidBw, refLvl, scale, delay;
+    var plot, cf, span, resBw, vidBw, refLvl, scale, delay, sigFreq;
     var socket = io.connect();
     var started = false;
     var tempCanvas = document.createElement("canvas");
@@ -63,6 +63,7 @@
         refLvl = $("#refLvlTxt").val();
         scale = $("#scaleTxt").val();
         delay = $("#delayTxt").val();
+        sigFreq = $("#sigFreq").val();
     }
 
     function requestPsd() {
@@ -75,7 +76,8 @@
                 resBw: resBw, 
                 vidBw: vidBw,
                 refLvl: refLvl,
-                scale: scale
+                scale: scale,
+                sigFreq: sigFreq
             }
         );
     }
@@ -148,7 +150,7 @@
         tempCtx.drawImage(canvas, 0, 0, 500, 300);
 
         var scale = chroma.scale(['#000000','#0B16B5','#FFF782','#EB1250'])
-                          .domain([-1,1]);
+                          .domain([-100,0]);
 
         // Bin down the data to fit on the plot
         // TODO: handle scaling up
@@ -166,39 +168,39 @@
         <div class="col-md-4">
             <form class="form-horizontal" role="form">
                 <div class="form-group">
-                    <label for="cfTxt" class="col-sm-6 control-label">Center Frequency (MHz)</label>
+                    <label for="cfTxt" class="col-sm-6 control-label">Center Frequency (Hz)</label>
                     <div class="col-sm-3">
                         <input type="number" class="form-control" id="cfTxt" value=20>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="spanTxt" class="col-sm-6 control-label">Span (MHz)</label>
+                    <label for="spanTxt" class="col-sm-6 control-label">Span (Hz)</label>
                     <div class="col-sm-3">
-                        <input type="number" class="form-control" id="spanTxt" value=10>
+                        <input type="number" class="form-control" id="spanTxt" value=40>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="resBwTxt" class="col-sm-6 control-label">RBW (kHz)</label>
+                    <label for="resBwTxt" class="col-sm-6 control-label">RBW (Hz)</label>
                     <div class="col-sm-3">
-                        <input type="number" class="form-control" id="resBwTxt" value=0.01>
+                        <input type="number" class="form-control" id="resBwTxt" value=0.05859375>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="vidBwTxt" class="col-sm-6 control-label">VBW (kHz)</label>
+                    <label for="vidBwTxt" class="col-sm-6 control-label">VBW (Hz)</label>
                     <div class="col-sm-3">
                         <input type="number" class="form-control" id="vidBwTxt" value=0.01>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="refLvlTxt" class="col-sm-6 control-label">Ref. Level (dBm/Hz)</label>
+                    <label for="refLvlTxt" class="col-sm-6 control-label">Ref. Level (dB/Hz)</label>
                     <div class="col-sm-3">
-                        <input type="number" class="form-control" id="refLvlTxt" value=2>
+                        <input type="number" class="form-control" id="refLvlTxt" value=60>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="scaleTxt" class="col-sm-6 control-label">Scale (dB/div)</label>
                     <div class="col-sm-3">
-                        <input type="number" class="form-control" id="scaleTxt" value=0.4>
+                        <input type="number" class="form-control" id="scaleTxt" value=20>
                     </div>
                 </div>
                 <div class="form-group">
@@ -207,6 +209,12 @@
                         <input type="number" class="form-control" id="delayTxt" value=200>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="sigFreq" class="col-sm-6 control-label">Signal Frequency (Hz)</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" id="sigFreq" value=20>
+                    </div>
+                </div
             </form>
             <button role="button" type="button" class="btn btn-default" id="apply">Apply</button>
             <button role="button" type="button" class="btn btn-default"id="stopStart">Stop</button>
