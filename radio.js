@@ -45,10 +45,19 @@ function getFFT(A, T, f, phi, n, startFreq) {
 	signal = windowing.hann(signal);
 	var NENBW = 1.5; // Hann window normalized equivalent noise bandwidth
 
+	// Subtract DC offset
+	var avg = 0;
+	for (var i = 0; i < n; i++)
+		avg += signal[i];
+	avg /= n;
+
+	for (var i = 0; i < n; i++)
+		signal[i] -= avg;
+
 	// Compute the FFT in place
 	var reals = signal.slice(0);
 	var imag = new Array(n);
-	for (var i = 0; i < imag.length; i++) 
+	for (var i = 0; i < n; i++) 
 		imag[i] = 0;
 	fft.transform(reals, imag);
 
