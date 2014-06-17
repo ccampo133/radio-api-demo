@@ -2,6 +2,7 @@ var sigGen = require('./sigGen.js');
 var modulator = require('./modulator.js');
 var fft = require('./fft.js');
 var windowing = require('fft-windowing');
+var filter = require('./filter.js');
 
 function getPsd(centerFreq, span, resBw, vidBw, refLvl, scale, sigFreq) {
 	var startFreq = centerFreq - span / 2.0;
@@ -41,7 +42,12 @@ function getFFT(A, T, f, phi, n, startFreq) {
 	// Heterodyne with LO signal to shift the DFT to the specified start frequency
 	if(startFreq != 0)
 		signal = sigGen.multiply([signal, sigGen.sinusoid(1, startFreq, t, 0)]);
+
+	// Anti-alias filter
+	//var FIRCoeff = filter.calcFilter(1/T, startFreq, 40, 31, -150);
+	//signal = filter.convFilter(FIRCoeff, signal, n, 1);
 	
+	// Apply window
 	signal = windowing.hann(signal);
 	var NENBW = 1.5; // Hann window normalized equivalent noise bandwidth
 
